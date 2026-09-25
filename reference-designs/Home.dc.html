@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>*{box-sizing:border-box}body{margin:0}a{color:#3B37FF;text-decoration:none}a:hover{color:#16134A}input,select,button{font:inherit}</style>
+</helmet>
+<div style="width:100%;background:#fff;color:#16134A;font-family:{{ bodyFont }};font-size:{{ bodySize }};line-height:1.6;overflow:hidden">
+  <div style="height:4px;background:linear-gradient(90deg,#3B37FF,#1AA8FF 55%,#00E5FF)"></div>
+  <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+    <header style="display:flex;align-items:center;gap:32px;padding:14px 64px;border-bottom:1px solid #ECECF6;background:#fff">
+      <img src="assets/logo.png" alt="Asepsis Edmond" style="height:52px;width:auto;display:block">
+      <nav style="display:flex;gap:28px;font-size:15px;font-weight:500;margin-left:16px">
+        <a href="#" style="color:#16134A">Home Cleaning</a>
+        <a href="#" style="color:#16134A">Post-Construction</a>
+        <a href="#" style="color:#16134A">Commercial</a>
+        <a href="#" style="color:#16134A">About</a>
+        <a href="#" style="color:#16134A">FAQ</a>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:20px">
+        <a href="tel:4055497722" style="font-weight:600;color:#16134A;font-size:15px">405-549-7722</a>
+        <a href="#" style="background:#3B37FF;color:#fff;padding:11px 20px;border-radius:8px;font-weight:600;font-size:15px">Get a Free Quote</a>
+      </div>
+    </header>
+  </sc-if>
+  <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+    <header style="display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #ECECF6">
+      <img src="assets/logo.png" alt="Asepsis Edmond" style="height:44px;width:auto;display:block">
+      <a href="tel:4055497722" style="margin-left:auto;display:flex;align-items:center;justify-content:center;height:44px;padding:0 14px;border:1px solid #D9D8F5;border-radius:8px;font-weight:600;font-size:14px;color:#16134A">Call</a>
+      <div style="width:44px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:8px;background:#F3F4FF">
+        <span style="width:18px;height:2px;background:#16134A"></span><span style="width:18px;height:2px;background:#16134A"></span><span style="width:18px;height:2px;background:#16134A"></span>
+      </div>
+    </header>
+  </sc-if>
+
+  <sc-if value="{{ isA }}" hint-placeholder-val="{{ false }}">
+    <section style="position:relative;height:{{ heroH }};background:#2A2760">
+      <image-slot id="{{ slotHero }}" shape="rect" placeholder="Photo: your crew finishing a bright, freshly cleaned kitchen"></image-slot>
+      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,15,64,.86) 0%,rgba(18,15,64,.6) 45%,rgba(18,15,64,0) 80%);pointer-events:none"></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:0 {{ padX }};max-width:760px;pointer-events:none">
+        <div style="font-size:12px;letter-spacing:.2em;font-weight:600;color:#9FE9FF">EDMOND · DEER CREEK · NORTH OKC</div>
+        <h1 style="margin:0;font-family:{{ headFont }};font-size:{{ h1Size }};line-height:1.08;font-weight:700;color:#fff;letter-spacing:-.02em;text-wrap:balance">Edmond &amp; Deer Creek Cleaning Services — From Construction Site to Move-In Day</h1>
+        <p style="margin:0;color:#E6E6F7;max-width:560px;text-wrap:pretty">Locally owned house cleaning, commercial cleaning and post-construction cleaning in Edmond, the Deer Creek area and north Oklahoma City. Fully insured. Ready to start within 48–72 hours.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;pointer-events:auto">
+          <a href="#quote" style="background:#fff;color:#3B37FF;padding:14px 24px;border-radius:8px;font-weight:600">Get a Free Quote</a>
+          <a href="tel:4055497722" style="border:1.5px solid rgba(255,255,255,.7);color:#fff;padding:13px 22px;border-radius:8px;font-weight:600">Call 405-549-7722</a>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isB }}" hint-placeholder-val="{{ false }}">
+    <section style="display:grid;grid-template-columns:{{ splitCols }};gap:{{ gapL }};align-items:center;padding:{{ heroPad }};background:#F6F6FF">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="font-size:12px;letter-spacing:.2em;font-weight:600;color:#3B37FF">EDMOND · DEER CREEK · NORTH OKC</div>
+        <h1 style="margin:0;font-family:{{ headFont }};font-size:{{ h1SizeB }};line-height:1.02;font-weight:400;color:#16134A;letter-spacing:-.01em;text-wrap:balance">Edmond &amp; Deer Creek Cleaning Services — <em style="color:#3B37FF">From Construction Site to Move-In Day</em></h1>
+        <p style="margin:0;color:#4A4868;max-width:520px;text-wrap:pretty">Locally owned house cleaning, commercial cleaning and post-construction cleaning in Edmond, the Deer Creek area and north Oklahoma City. Fully insured. Ready to start within 48–72 hours.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <a href="#quote" style="background:#3B37FF;color:#fff;padding:14px 24px;border-radius:999px;font-weight:600">Get a Free Quote</a>
+          <a href="tel:4055497722" style="border:1.5px solid #3B37FF;color:#3B37FF;padding:13px 22px;border-radius:999px;font-weight:600">Call 405-549-7722</a>
+        </div>
+      </div>
+      <div style="position:relative;height:{{ splitImgH }}">
+        <image-slot id="{{ slotHero }}" shape="rounded" radius="24" placeholder="Photo: your crew finishing a bright, freshly cleaned kitchen"></image-slot>
+        <div style="position:absolute;left:-14px;bottom:-14px;width:120px;height:120px;border-radius:24px;background:linear-gradient(135deg,#3B37FF,#1AA8FF 60%,#00E5FF);z-index:-1"></div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isC }}" hint-placeholder-val="{{ false }}">
+    <section style="position:relative;min-height:{{ heroH }};background:#2A2760;display:grid;grid-template-columns:{{ splitCols }};gap:40px;align-items:center;padding:{{ heroPadC }}">
+      <div style="position:absolute;inset:0"><image-slot id="{{ slotHero }}" shape="rect" placeholder="Photo: your crew finishing a bright, freshly cleaned kitchen"></image-slot></div>
+      <div style="position:absolute;inset:0;background:rgba(18,15,64,.62);pointer-events:none"></div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:18px;pointer-events:none">
+        <div style="font-size:12px;letter-spacing:.2em;font-weight:600;color:#9FE9FF">EDMOND · DEER CREEK · NORTH OKC</div>
+        <h1 style="margin:0;font-family:{{ headFont }};font-size:{{ h1Size }};line-height:1.04;font-weight:700;color:#fff;letter-spacing:-.025em;text-wrap:balance">Edmond &amp; Deer Creek Cleaning Services — From Construction Site to Move-In Day</h1>
+        <p style="margin:0;color:#E6E6F7;max-width:520px;text-wrap:pretty">Locally owned house cleaning, commercial cleaning and post-construction cleaning in Edmond, the Deer Creek area and north Oklahoma City. Fully insured. Ready to start within 48–72 hours.</p>
+        <a href="tel:4055497722" style="color:#fff;font-weight:600;font-size:18px;pointer-events:auto">Or call 405-549-7722</a>
+      </div>
+      <form style="position:relative;background:#fff;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 60px rgba(10,8,40,.35)">
+        <div style="font-family:{{ headFont }};font-weight:700;font-size:24px;line-height:1.2">Get a Free Quote</div>
+        <div style="font-size:14px;color:#4A4868;margin-top:-8px">Homes start at $120. We reply the same day.</div>
+        <input placeholder="Your name" style="height:48px;border:1px solid #D9D8F5;border-radius:8px;padding:0 14px;font-size:15px">
+        <input placeholder="Phone" style="height:48px;border:1px solid #D9D8F5;border-radius:8px;padding:0 14px;font-size:15px">
+        <select style="height:48px;border:1px solid #D9D8F5;border-radius:8px;padding:0 12px;font-size:15px;background:#fff;color:#16134A">
+          <option>Home Cleaning</option><option>Post-Construction</option><option>Commercial &amp; Janitorial</option>
+        </select>
+        <button type="button" style="height:52px;border:0;border-radius:8px;background:#3B37FF;color:#fff;font-weight:600;font-size:16px;cursor:pointer">Request My Quote</button>
+      </form>
+    </section>
+  </sc-if>
+
+  <section style="display:grid;grid-template-columns:{{ cols4 }};gap:1px;background:#ECECF6;border-bottom:1px solid #ECECF6">
+    <sc-for list="{{ trust }}" as="t" hint-placeholder-count="4">
+      <div style="background:#fff;display:flex;align-items:center;gap:10px;padding:{{ trustPad }};font-size:14px;font-weight:600;color:#16134A">
+        <span style="flex:none;width:22px;height:22px;border-radius:50%;background:#EEF0FF;color:#3B37FF;display:flex;align-items:center;justify-content:center;font-size:12px">✓</span>{{ t }}
+      </div>
+    </sc-for>
+  </section>
+
+  <section style="padding:{{ secPad }};display:flex;flex-direction:column;gap:36px">
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:640px">
+      <div style="font-size:12px;letter-spacing:.2em;font-weight:600;color:#3B37FF">OUR SERVICES</div>
+      <h2 style="margin:0;font-family:{{ headFont }};font-size:{{ h2Size }};line-height:1.12;font-weight:{{ h2Weight }};letter-spacing:-.015em;text-wrap:balance">One insured local team for homes, job sites and businesses</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:{{ cols3 }};gap:20px">
+      <sc-for list="{{ services }}" as="s" hint-placeholder-count="3">
+        <div style="border:1px solid #E4E4F3;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px;background:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="width:52px;height:52px;border-radius:14px;background:#F0F1FF;display:flex;align-items:center;justify-content:center">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3B37FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ s.icon }}"></path></svg>
+            </div>
+            <span style="font-size:12px;font-weight:700;letter-spacing:.08em;color:#3B37FF;background:#F0F1FF;padding:5px 10px;border-radius:999px">{{ s.price }}</span>
+          </div>
+          <h3 style="margin:0;font-family:{{ headFont }};font-size:22px;font-weight:{{ h2Weight }};line-height:1.2">{{ s.title }}</h3>
+          <p style="margin:0;color:#4A4868;font-size:15px;flex:1;text-wrap:pretty">{{ s.text }}</p>
+          <a href="#" style="font-weight:600;font-size:15px">{{ s.link }}</a>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+      <a href="#quote" style="background:#3B37FF;color:#fff;padding:12px 22px;border-radius:{{ btnRadius }};font-weight:600;font-size:15px">Get a Free Quote</a>
+      <a href="tel:4055497722" style="font-weight:600;font-size:15px;color:#16134A">or call 405-549-7722</a>
+    </div>
+  </section>
+
+  <section style="padding:{{ secPad }};background:#F6F6FF;display:grid;grid-template-columns:{{ whyCols }};gap:40px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:12px;letter-spacing:.2em;font-weight:600;color:#3B37FF">WHY ASEPSIS EDMOND</div>
+      <h2 style="margin:0;font-family:{{ headFont }};font-size:{{ h2Size }};line-height:1.12;font-weight:{{ h2Weight }};letter-spacing:-.015em">Built for the hard jobs</h2>
+      <p style="margin:0;color:#4A4868;text-wrap:pretty">Our roots are in post-construction cleaning: drywall dust, paint splatter, sticker residue and grout haze. A regular home clean is easy after that.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:{{ cols2 }};gap:28px 36px">
+      <sc-for list="{{ why }}" as="w" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:6px;padding-top:16px;border-top:2px solid #DCDDFB">
+          <div style="font-weight:700;font-size:17px">{{ w.t }}</div>
+          <div style="color:#4A4868;font-size:15px;text-wrap:pretty">{{ w.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:{{ secPad }};display:flex;flex-direction:column;gap:36px">
+    <h2 style="margin:0;font-family:{{ headFont }};font-size:{{ h2Size }};line-height:1.12;font-weight:{{ h2Weight }};letter-spacing:-.015em">How it works</h2>
+    <div style="display:grid;grid-template-columns:{{ cols3 }};gap:28px">
+      <sc-for list="{{ steps }}" as="st" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3B37FF,#1AA8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:{{ headFont }}">{{ st.n }}</div>
+          <div style="font-weight:700;font-size:18px">{{ st.t }}</div>
+          <div style="color:#4A4868;font-size:15px;text-wrap:pretty">{{ st.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="quote" style="padding:{{ secPad }};background:#16134A;color:#fff;display:grid;grid-template-columns:{{ splitCols }};gap:40px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-family:{{ headFont }};font-size:{{ h2Size }};line-height:1.1;font-weight:{{ h2Weight }};letter-spacing:-.015em">Ready for a cleaner space?</h2>
+      <p style="margin:0;color:#D6D5F2">Get a free quote today. Homes start at $120.</p>
+      <a href="tel:4055497722" style="color:#8FE6FF;font-weight:600;font-size:20px">405-549-7722</a>
+    </div>
+    <sc-if value="{{ showBottomForm }}" hint-placeholder-val="{{ true }}">
+      <form style="background:#fff;border-radius:16px;padding:24px;display:grid;grid-template-columns:{{ formCols }};gap:12px;color:#16134A">
+        <input placeholder="Your name" style="height:48px;border:1px solid #D9D8F5;border-radius:8px;padding:0 14px;font-size:15px">
+        <input placeholder="Phone" style="height:48px;border:1px solid #D9D8F5;border-radius:8px;padding:0 14px;font-size:15px">
+        <select style="height:48px;border:1px solid #D9D8F5;border-radius:8px;padding:0 12px;font-size:15px;background:#fff;color:#16134A">
+          <option>Home Cleaning</option><option>Post-Construction</option><option>Commercial &amp; Janitorial</option>
+        </select>
+        <button type="button" style="height:48px;border:0;border-radius:8px;background:#3B37FF;color:#fff;font-weight:600;font-size:15px;cursor:pointer">Get a Free Quote</button>
+      </form>
+    </sc-if>
+    <sc-if value="{{ isC }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:{{ ctaJustify }}">
+        <a href="#" style="background:#fff;color:#3B37FF;padding:14px 24px;border-radius:8px;font-weight:600">Get a Free Quote</a>
+        <a href="tel:4055497722" style="border:1.5px solid rgba(255,255,255,.6);color:#fff;padding:13px 22px;border-radius:8px;font-weight:600">Call 405-549-7722</a>
+      </div>
+    </sc-if>
+  </section>
+
+  <footer style="padding:{{ footPad }};background:#0F0D36;color:#C9C8EA;display:grid;grid-template-columns:{{ splitCols }};gap:28px;font-size:14px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="color:#fff;font-weight:700;font-size:16px">Asepsis Edmond LLC</div>
+      <div>15305 Jasper Lane, Edmond, OK 73013</div>
+      <div>405-549-7722 · asepsisedmond@gmail.com</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="color:#fff;font-weight:700;font-size:16px">Service area</div>
+      <div style="text-wrap:pretty">Edmond · Deer Creek · North Oklahoma City · Oklahoma City · Norman · Moore · Yukon · Mustang · Midwest City</div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;direction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;a&quot;,&quot;b&quot;,&quot;c&quot;],&quot;default&quot;:&quot;a&quot;,&quot;tsType&quot;:&quot;'a'|'b'|'c'&quot;},&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const dir = this.props.direction ?? 'a';
+    const m = !!this.props.mobile;
+    const fonts = {
+      a: ['Poppins, sans-serif', 'Poppins, sans-serif'],
+      b: ['"Instrument Serif", serif', 'Figtree, sans-serif'],
+      c: ['"Bricolage Grotesque", sans-serif', 'Figtree, sans-serif'],
+    }[dir];
+    const px = m ? '20px' : '64px';
+    return {
+      mobile: m, desktop: !m, isA: dir === 'a', isB: dir === 'b', isC: dir === 'c',
+      headFont: fonts[0], bodyFont: fonts[1], bodySize: m ? '16px' : '17px',
+      padX: px, heroH: m ? '600px' : '640px',
+      h1Size: m ? '34px' : '56px', h1SizeB: m ? '44px' : '72px',
+      h2Size: m ? (dir === 'b' ? '36px' : '28px') : (dir === 'b' ? '52px' : '40px'),
+      h2Weight: dir === 'b' ? 400 : 700,
+      btnRadius: dir === 'b' ? '999px' : '8px',
+      splitCols: m ? '1fr' : 'minmax(0,1.05fr) minmax(0,1fr)',
+      splitImgH: m ? '300px' : '520px', gapL: m ? '32px' : '56px',
+      heroPad: m ? '40px 20px 48px' : '72px 64px',
+      heroPadC: m ? '48px 20px' : '64px',
+      cols4: m ? '1fr 1fr' : 'repeat(4,1fr)', cols3: m ? '1fr' : 'repeat(3,minmax(0,1fr))',
+      cols2: m ? '1fr' : '1fr 1fr', whyCols: m ? '1fr' : 'minmax(0,.8fr) minmax(0,1.6fr)',
+      formCols: m ? '1fr' : '1fr 1fr',
+      trustPad: m ? '14px 16px' : '20px 24px',
+      secPad: m ? '56px 20px' : '96px 64px', footPad: m ? '40px 20px' : '48px 64px',
+      showBottomForm: dir !== 'c', ctaJustify: m ? 'flex-start' : 'flex-end',
+      slotHero: `home-${dir}-${m ? 'm' : 'd'}-hero`,
+      trust: ["Fully Insured (GL + Workers' Comp)", 'Locally Owned in Edmond, OK', 'Mobilize in 48–72 Hours', 'All Supplies Included'],
+      services: [
+        { price: 'FROM $120', title: 'Home Cleaning', text: 'Standard, deep and move-in/move-out cleaning with flat, upfront pricing by home size. No hourly surprises.', link: 'See Residential Pricing →', icon: 'M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6' },
+        { price: '$0.45 / SQ FT', title: 'Post-Construction Cleaning', text: 'Rough, pre-punch and final cleans for general contractors and builders. Firm fixed-price bids.', link: 'Request a Bid →', icon: 'M4 17h16v3H4zM6 17a6 6 0 0112 0M12 5v6M9 7.5V11M15 7.5V11' },
+        { price: 'CUSTOM QUOTE', title: 'Commercial & Janitorial', text: 'Recurring office cleaning, apartment turnovers, hotel deep cleans and exterior pressure washing.', link: 'Explore Commercial Services →', icon: 'M4 21V4h10v17M14 9h6v12M7 8h4M7 12h4M7 16h4M3 21h18' },
+      ],
+      why: [
+        { t: 'Fast start', d: 'We can mobilize within 48–72 hours of your go-ahead.' },
+        { t: 'Flat, clear pricing', d: 'Homes are priced by size and service level. Commercial projects get a firm fixed-price quote.' },
+        { t: 'Fully insured', d: 'General liability and workers\u2019 compensation coverage. Certificate of insurance available on request.' },
+        { t: 'Local and responsive', d: 'Based in Edmond, cleaning across Edmond, Deer Creek, north OKC, Norman, Moore, Yukon, Mustang and the metro.' },
+        { t: 'Checklist-driven', d: 'Every job follows a written checklist and ends with a final walk-through.' },
+      ],
+      steps: [
+        { n: 1, t: 'Request a quote', d: 'Tell us about your home, building or project online or by phone.' },
+        { n: 2, t: 'Get a clear price', d: 'Homes get a flat rate right away. Commercial and construction jobs get a firm written quote.' },
+        { n: 3, t: 'We clean and walk it with you', d: 'Our crew works from a checklist, then does a final walk-through before we leave.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

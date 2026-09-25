@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box}body{margin:0}a{color:#3B37FF}a:hover{color:#231B4D}input,select,textarea,button{font:inherit;color:#231B4D}</style>
+</helmet>
+<div style="background:#fff;border:1px solid #EEE4D9;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(40,36,140,.10);font-family:'Nunito Sans',sans-serif;color:#231B4D;font-size:15px;line-height:1.5">
+  <sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}"><div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #EEE4D9">
+    <button type="button" onClick="{{ tabBook }}" style="height:56px;border:0;cursor:pointer;font-weight:600;font-size:{{ tabFs }};background:{{ bookTabBg }};color:{{ bookTabFg }};box-shadow:{{ bookTabLine }}">Book a home clean</button>
+    <button type="button" onClick="{{ tabQuote }}" style="height:56px;border:0;cursor:pointer;font-weight:600;font-size:{{ tabFs }};background:{{ quoteTabBg }};color:{{ quoteTabFg }};box-shadow:{{ quoteTabLine }}">{{ quoteTabLabel }}</button>
+  </div></sc-if>
+
+  <sc-if value="{{ isBook }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:{{ pad }};display:flex;flex-direction:column;gap:22px">
+      <sc-if value="{{ showStepper }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:#5B5570"><span>Step {{ step }} of 4 · {{ stepName }}</span><span>{{ priceFmt }}</span></div>
+          <div style="height:4px;border-radius:4px;background:#F1EAE2;overflow:hidden"><div style="height:100%;width:{{ progress }};background:linear-gradient(90deg,#3B37FF,#1AA8FF 60%,#00E5FF);transition:width .3s"></div></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s1 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-weight:700">Home size</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ sizes }}" as="z" hint-placeholder-count="5">
+              <button type="button" onClick="{{ z.pick }}" style="min-height:44px;padding:0 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;border:1.5px solid {{ z.bd }};background:{{ z.bg }};color:{{ z.fg }}">{{ z.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-weight:700">Type of clean</div>
+          <div style="display:grid;grid-template-columns:{{ typeCols }};gap:10px">
+            <sc-for list="{{ types }}" as="ty" hint-placeholder-count="3">
+              <button type="button" onClick="{{ ty.pick }}" style="text-align:left;padding:14px 16px;border-radius:14px;cursor:pointer;border:1.5px solid {{ ty.bd }};background:{{ ty.bg }};display:flex;flex-direction:column;gap:2px">
+                <span style="font-weight:700;font-size:15px">{{ ty.name }}</span>
+                <span style="font-size:13px;color:#5B5570">{{ ty.desc }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding:18px 20px;border-radius:16px;background:#FBF6F0">
+          <div style="display:flex;flex-direction:column">
+            <span style="font-size:13px;font-weight:600;color:#5B5570">Your flat rate</span>
+            <span style="font-family:'DM Serif Display',serif;font-size:46px;line-height:1;color:#3B37FF">{{ priceFmt }}</span>
+            <span style="font-size:13px;color:#5B5570">Up to 2 full baths and 3,000 sq ft. Supplies included.</span>
+          </div>
+          <button type="button" onClick="{{ next }}" style="height:52px;padding:0 28px;border:0;border-radius:999px;background:#3B37FF;color:#fff;font-weight:600;font-size:16px;cursor:pointer">Pick a date →</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-weight:700">Choose a day</div>
+          <div style="display:grid;grid-template-columns:{{ dateCols }};gap:8px">
+            <sc-for list="{{ dates }}" as="d" hint-placeholder-count="12">
+              <button type="button" onClick="{{ d.pick }}" style="padding:10px 4px;border-radius:12px;cursor:pointer;border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};display:flex;flex-direction:column;align-items:center;gap:0">
+                <span style="font-size:12px;font-weight:600;opacity:.8">{{ d.dow }}</span>
+                <span style="font-size:20px;font-weight:700">{{ d.day }}</span>
+                <span style="font-size:11px;opacity:.8">{{ d.mon }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-weight:700">Arrival window</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <sc-for list="{{ windows }}" as="w" hint-placeholder-count="2">
+              <button type="button" onClick="{{ w.pick }}" style="min-height:56px;border-radius:14px;cursor:pointer;border:1.5px solid {{ w.bd }};background:{{ w.bg }};font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center"><span>{{ w.label }}</span><span style="font-size:12px;font-weight:500;color:#5B5570">{{ w.time }}</span></button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px">
+          <button type="button" onClick="{{ back }}" style="height:48px;padding:0 20px;border:1.5px solid #E4D8CB;border-radius:999px;background:#fff;font-weight:600;cursor:pointer">Back</button>
+          <button type="button" onClick="{{ next }}" style="height:48px;padding:0 26px;border:0;border-radius:999px;background:#3B37FF;color:#fff;font-weight:600;cursor:pointer">Continue →</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s3 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:{{ fieldCols }};gap:12px">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Name<input placeholder="Full name" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Phone<input placeholder="405-555-0123" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;grid-column:1/-1">Service address<input value="{{ address }}" onChange="{{ setAddress }}" placeholder="Street, city, ZIP" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Email<input placeholder="you@email.com" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">How do we get in?<select style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 12px;font-size:15px;font-weight:400;background:#fff"><option>I'll be home</option><option>Door code</option><option>Lockbox / hidden key</option><option>Other</option></select></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;grid-column:1/-1">Entry instructions<textarea rows="3" placeholder="Gate code, pets, parking, alarm…" style="border:1px solid #E4D8CB;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:400;resize:vertical"></textarea></label>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px">
+          <button type="button" onClick="{{ back }}" style="height:48px;padding:0 20px;border:1.5px solid #E4D8CB;border-radius:999px;background:#fff;font-weight:600;cursor:pointer">Back</button>
+          <button type="button" onClick="{{ next }}" style="height:48px;padding:0 26px;border:0;border-radius:999px;background:#3B37FF;color:#fff;font-weight:600;cursor:pointer">Review &amp; pay →</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s4 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:18px 20px;border-radius:16px;background:#FBF6F0">
+          <sc-for list="{{ summary }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;justify-content:space-between;gap:16px;font-size:14px"><span style="color:#5B5570">{{ r.k }}</span><span style="font-weight:600;text-align:right">{{ r.v }}</span></div>
+          </sc-for>
+          <div style="height:1px;background:#EADFD3;margin:6px 0"></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">Deposit due today (25%)</span><span style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#3B37FF">{{ depositFmt }}</span></div>
+          <div style="font-size:13px;color:#5B5570">Balance of {{ balanceFmt }} is charged after your final walk-through.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:{{ cardCols }};gap:12px">
+          <input placeholder="Card number" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px">
+          <input placeholder="MM / YY" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px">
+          <input placeholder="CVC" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px">
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px">
+          <button type="button" onClick="{{ back }}" style="height:52px;padding:0 20px;border:1.5px solid #E4D8CB;border-radius:999px;background:#fff;font-weight:600;cursor:pointer">Back</button>
+          <button type="button" onClick="{{ next }}" style="height:52px;padding:0 26px;border:0;border-radius:999px;background:#3B37FF;color:#fff;font-weight:600;font-size:16px;cursor:pointer">Pay {{ depositFmt }} &amp; book</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s5 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:12px 0">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3B37FF,#1AA8FF 60%,#00E5FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px">✓</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1.05">You're booked.</div>
+          <div style="color:#5B5570">{{ confirmLine }} A confirmation is on its way by text and email. Need to change something? Call 405-549-7722.</div>
+          <button type="button" onClick="{{ restart }}" style="height:44px;padding:0 20px;border:1.5px solid #E4D8CB;border-radius:999px;background:#fff;font-weight:600;cursor:pointer">Book another clean</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isQuote }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ quoteOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:{{ pad }};display:flex;flex-direction:column;gap:16px">
+        <div style="color:#5B5570">Tell us a little about your space and we'll get back to you with a clear price, usually the same business day.</div>
+        <div style="display:grid;grid-template-columns:{{ fieldCols }};gap:12px">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Name *<input style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Phone *<input type="tel" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Email *<input type="email" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Service needed *<select style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 12px;font-size:15px;font-weight:400;background:#fff"><sc-for list="{{ serviceOpts }}" as="o" hint-placeholder-count="9"><option>{{ o }}</option></sc-for></select></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Property address or city *<input style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Bedrooms / bathrooms (homes)<input style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Approximate square footage<input type="number" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">How often?<select style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 12px;font-size:15px;font-weight:400;background:#fff"><option>One-time</option><option>Weekly</option><option>Every 2 weeks</option><option>Every 4 weeks</option><option>Not sure</option></select></label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Preferred date<input type="date" style="height:48px;border:1px solid #E4D8CB;border-radius:10px;padding:0 14px;font-size:15px;font-weight:400"></label>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600">Plans or photos<div style="height:48px;border:1.5px dashed #C9C8F0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:500;color:#5B5570;background:#FDFAF6">Drop files or browse</div></div>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;grid-column:1/-1">Anything else we should know?<textarea rows="3" style="border:1px solid #E4D8CB;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:400;resize:vertical"></textarea></label>
+        </div>
+        <button type="button" onClick="{{ sendQuote }}" style="align-self:flex-start;height:52px;padding:0 28px;border:0;border-radius:999px;background:#3B37FF;color:#fff;font-weight:600;font-size:16px;cursor:pointer">Send My Quote Request</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ quoteSent }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:{{ pad }};display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3B37FF,#1AA8FF 60%,#00E5FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px">✓</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1.1">Thanks! We've got your request and will be in touch shortly.</div>
+        <div style="color:#5B5570">Need us sooner? Call <a href="tel:4055497722" style="font-weight:600">405-549-7722</a>.</div>
+      </div>
+    </sc-if>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:760,&quot;height&quot;:720},&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;book&quot;,&quot;quote&quot;],&quot;default&quot;:&quot;book&quot;,&quot;tsType&quot;:&quot;'book'|'quote'&quot;}}">
+class Component extends DCLogic {
+  state = { tab: null, step: 1, size: 2, type: 0, date: 0, win: 0, address: '', quoteSent: false };
+  renderVals() {
+    const m = !!this.props.mobile;
+    const tab = this.props.bookOnly ? 'book' : (this.state.tab ?? (this.props.tab || 'book'));
+    const { step, size, type, date, win } = this.state;
+    const set = (o) => () => this.setState(o);
+    const table = [[150, 170, 190, 235, 295], [245, 275, 305, 375, 475], [300, 340, 380, 470, 590]];
+    const price = table[type][size];
+    const dep = Math.round(price * 0.25);
+    const $ = (n) => '$' + n;
+    const sel = (on) => ({ bd: on ? '#3B37FF' : '#E9DFD4', bg: on ? '#EEF0FF' : '#fff', fg: on ? '#3B37FF' : '#231B4D' });
+    const sizeLabels = ['Studio / 1 bed', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5+ bedrooms'];
+    const typeData = [
+      { name: 'Standard', desc: 'Regular upkeep' },
+      { name: 'Deep Clean', desc: 'Baseboards, fans, vents, grout' },
+      { name: 'Move-In / Out', desc: 'Inside every cabinet & appliance' },
+    ];
+    const dates = [];
+    const d0 = new Date(); d0.setDate(d0.getDate() + 2);
+    while (dates.length < (m ? 8 : 12)) {
+      if (d0.getDay() !== 0) dates.push(new Date(d0));
+      d0.setDate(d0.getDate() + 1);
+    }
+    const wins = [{ label: 'Morning', time: '8 am – 12 pm' }, { label: 'Afternoon', time: '12 – 5 pm' }];
+    const dSel = dates[Math.min(date, dates.length - 1)];
+    const dLong = dSel.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    const tabOn = (on) => ({ bg: on ? '#fff' : '#FBF6F0', fg: on ? '#3B37FF' : '#5B5570', line: on ? 'inset 0 -3px 0 #3B37FF' : 'none' });
+    const tb = tabOn(tab === 'book'), tq = tabOn(tab === 'quote');
+    return {
+      showTabs: !this.props.bookOnly,
+      pad: m ? '20px' : '28px', tabFs: m ? '14px' : '15px',
+      bookTabBg: tb.bg, bookTabFg: tb.fg, bookTabLine: tb.line,
+      quoteTabBg: tq.bg, quoteTabFg: tq.fg, quoteTabLine: tq.line,
+      quoteTabLabel: m ? 'Request a quote' : 'Commercial & construction quote',
+      tabBook: set({ tab: 'book' }), tabQuote: set({ tab: 'quote' }),
+      isBook: tab === 'book', isQuote: tab === 'quote',
+      showStepper: step < 5, step, stepName: ['Your clean', 'Date & time', 'Address & entry', 'Deposit'][step - 1] || '',
+      progress: (step / 4 * 100) + '%',
+      s1: step === 1, s2: step === 2, s3: step === 3, s4: step === 4, s5: step === 5,
+      next: () => this.setState({ step: step + 1 }), back: () => this.setState({ step: step - 1 }),
+      restart: set({ step: 1 }),
+      sizes: sizeLabels.map((label, i) => ({ label, pick: set({ size: i }), ...sel(i === size) })),
+      types: typeData.map((t, i) => ({ ...t, pick: set({ type: i }), ...sel(i === type) })),
+      typeCols: m ? 'minmax(0,1fr)' : 'repeat(3,minmax(0,1fr))',
+      priceFmt: $(price), depositFmt: $(dep), balanceFmt: $(price - dep),
+      dates: dates.map((d, i) => ({ dow: d.toLocaleDateString('en-US', { weekday: 'short' }), day: d.getDate(), mon: d.toLocaleDateString('en-US', { month: 'short' }), pick: set({ date: i }), ...sel(i === date) })),
+      dateCols: m ? 'repeat(4,1fr)' : 'repeat(6,1fr)',
+      windows: wins.map((w, i) => ({ ...w, pick: set({ win: i }), ...sel(i === win) })),
+      fieldCols: m ? 'minmax(0,1fr)' : '1fr 1fr', cardCols: m ? 'repeat(2,minmax(0,1fr))' : '2fr 1fr 1fr',
+      address: this.state.address, setAddress: (e) => this.setState({ address: e.target.value }),
+      summary: [
+        { k: 'Clean', v: `${typeData[type].name} · ${sizeLabels[size]}` },
+        { k: 'When', v: `${dLong} · ${wins[win].time}` },
+        { k: 'Where', v: this.state.address || '—' },
+        { k: 'Total', v: $(price) },
+      ],
+      confirmLine: `${typeData[type].name} on ${dLong}, ${wins[win].time}.`,
+      serviceOpts: ['Standard', 'Deep', 'Move-In/Out', 'Post-Construction', 'Office/Janitorial', 'Apartment Turnover', 'Hotel', 'Pressure Washing', 'Other'],
+      quoteOpen: !this.state.quoteSent, quoteSent: this.state.quoteSent, sendQuote: set({ quoteSent: true }),
+    };
+  }
+}
+</script>
+</body>
+</html>

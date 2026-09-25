@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E9F1}a{color:#3B37FF}a:hover{color:#16134A}</style>
+</helmet>
+<section style="padding:64px;display:flex;flex-direction:column;gap:32px;font-family:Poppins,sans-serif;color:#16134A;border-bottom:2px solid #D6D6E6">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:14px;font-weight:600;color:#3B37FF;letter-spacing:.12em">TURN 3 · WARM, HOMEOWNER-FIRST</div>
+    <div style="font-size:15px;color:#4A4868;max-width:820px">Home speaks to Deer Creek and Edmond families. Post-construction and commercial moved to one Builders &amp; Businesses page.</div>
+  </div>
+  <div id="3a" style="display:flex;gap:40px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="background:#16134A;color:#fff;font-weight:700;padding:4px 10px;border-radius:6px">3a</span><span style="font-weight:600;font-size:18px">Desktop · 1280</span></div>
+      <div style="width:1280px;height:860px;flex:none;border-radius:12px;overflow:hidden;box-shadow:0 8px 40px rgba(20,18,70,.14);background:#fff"><dc-import name="Asepsis Website v2" frame-height="{{ 860 }}" hint-size="1280px,860px"></dc-import></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-weight:600;font-size:18px">Mobile · 390</div>
+      <div style="width:390px;height:844px;flex:none;border-radius:40px;overflow:hidden;border:10px solid #16134A;box-shadow:0 8px 40px rgba(20,18,70,.14);background:#fff"><dc-import name="Asepsis Website v2" mobile="{{ true }}" frame-height="{{ 824 }}" hint-size="370px,824px"></dc-import></div>
+    </div>
+  </div>
+</section>
+<section style="padding:64px;display:flex;flex-direction:column;gap:32px;font-family:Poppins,sans-serif;color:#16134A;border-bottom:2px solid #D6D6E6">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:14px;font-weight:600;color:#3B37FF;letter-spacing:.12em">TURN 2 · FULL SITE, DIRECTION 1B</div>
+    <div style="font-size:15px;color:#4A4868;max-width:820px">Clickable prototype. Use the nav to move between Home, Home Cleaning, Post-Construction, Commercial, About, FAQ and Book / Quote. Booking: size + clean type → date & window → address & entry → 25% deposit.</div>
+  </div>
+  <div id="2a" style="display:flex;gap:40px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="background:#16134A;color:#fff;font-weight:700;padding:4px 10px;border-radius:6px">2a</span><span style="font-weight:600;font-size:18px">Desktop · 1280</span></div>
+      <div style="width:1280px;height:860px;flex:none;border-radius:12px;overflow:hidden;box-shadow:0 8px 40px rgba(20,18,70,.14);background:#fff"><dc-import name="Asepsis Website" frame-height="{{ 860 }}" hint-size="1280px,860px"></dc-import></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-weight:600;font-size:18px">Mobile · 390</span></div>
+      <div style="width:390px;height:844px;flex:none;border-radius:40px;overflow:hidden;border:10px solid #16134A;box-shadow:0 8px 40px rgba(20,18,70,.14);background:#fff"><dc-import name="Asepsis Website" mobile="{{ true }}" frame-height="{{ 824 }}" hint-size="370px,824px"></dc-import></div>
+    </div>
+  </div>
+</section>
+<section style="padding:64px;display:flex;flex-direction:column;gap:32px;font-family:Poppins,sans-serif;color:#16134A">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:14px;font-weight:600;color:#3B37FF;letter-spacing:.12em">TURN 1 · HOME PAGE DIRECTIONS</div>
+    <div style="font-size:15px;color:#4A4868;max-width:760px">Same copy and structure, three hero and type treatments. Pick one and I'll roll it out to Residential, Post-Construction, Commercial, About, FAQ and Get a Quote. Drop photos onto the placeholders.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:72px">
+    <div id="1a" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="background:#16134A;color:#fff;font-weight:700;padding:4px 10px;border-radius:6px">1a</span><span style="font-weight:600;font-size:18px">Clinical: text on full-bleed photo, Poppins</span></div>
+      <div style="display:flex;gap:40px;align-items:flex-start">
+        <div style="width:1280px;flex:none;box-shadow:0 8px 40px rgba(20,18,70,.12)"><dc-import name="Home" direction="a" hint-size="1280px,4200px"></dc-import></div>
+        <div style="width:390px;flex:none;box-shadow:0 8px 40px rgba(20,18,70,.12)"><dc-import name="Home" direction="a" mobile="{{ true }}" hint-size="390px,6000px"></dc-import></div>
+      </div>
+    </div>
+    <div id="1b" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="background:#16134A;color:#fff;font-weight:700;padding:4px 10px;border-radius:6px">1b</span><span style="font-weight:600;font-size:18px">Warm: split hero, serif headlines, pill buttons</span></div>
+      <div style="display:flex;gap:40px;align-items:flex-start">
+        <div style="width:1280px;flex:none;box-shadow:0 8px 40px rgba(20,18,70,.12)"><dc-import name="Home" direction="b" hint-size="1280px,4200px"></dc-import></div>
+        <div style="width:390px;flex:none;box-shadow:0 8px 40px rgba(20,18,70,.12)"><dc-import name="Home" direction="b" mobile="{{ true }}" hint-size="390px,6000px"></dc-import></div>
+      </div>
+    </div>
+    <div id="1c" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="background:#16134A;color:#fff;font-weight:700;padding:4px 10px;border-radius:6px">1c</span><span style="font-weight:600;font-size:18px">Quote-first: form in the hero, grotesque headlines</span></div>
+      <div style="display:flex;gap:40px;align-items:flex-start">
+        <div style="width:1280px;flex:none;box-shadow:0 8px 40px rgba(20,18,70,.12)"><dc-import name="Home" direction="c" hint-size="1280px,4200px"></dc-import></div>
+        <div style="width:390px;flex:none;box-shadow:0 8px 40px rgba(20,18,70,.12)"><dc-import name="Home" direction="c" mobile="{{ true }}" hint-size="390px,6000px"></dc-import></div>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+</body>
+</html>
