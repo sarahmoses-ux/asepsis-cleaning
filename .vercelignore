@@ -7,11 +7,6 @@ dist/
 test-results/
 playwright-report/
 tests/
-src/*.test.js
-server/*.test.js
-reference-designs/
-uploads/
-assets/
+references/
 docs/
 .thumbnail
-WhatsApp Image 2026-09-25 at 5.45.44 PM.jpeg

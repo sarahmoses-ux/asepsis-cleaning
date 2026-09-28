@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { publishedPosts } from './content.js';
-import { contactFor } from './site-config.js';
-const posts = JSON.parse(readFileSync(new URL('../content/blog.json', import.meta.url)));
+import { publishedPosts } from '../../src/lib/content.js';
+import { contactFor } from '../../shared/site-config.js';
+const posts = JSON.parse(readFileSync(new URL('../../content/blog.json', import.meta.url)));
 
 test('scheduled content only appears after its publishing time and approval', () => {
   const queue = [
@@ -30,7 +30,7 @@ test('enquiries use the correct residential or commercial inbox',()=>{
   assert.equal(contactFor('project').email,'asepsisedmond@gmail.com');
 });
 test('live source no longer contains the business street address or address map link',()=>{
-  for(const file of ['main.jsx','CommunityPages.jsx','site-config.js']) {
+  for(const file of ['../../src/App.jsx','../../src/pages/CommunityPages.jsx','../../shared/site-config.js']) {
     assert.doesNotMatch(readFileSync(new URL(file,import.meta.url),'utf8'),/15305|Jasper|73013/);
   }
 });

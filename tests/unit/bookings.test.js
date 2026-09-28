@@ -1,11 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createBookingHandler} from '../api/bookings.js';
-import {isEnabled,notificationsFor,requiredSettings,smsRecipients,validateBooking} from './bookings.js';
-import {createProviders,dispatchNotifications} from './notifications.js';
+import {createBookingHandler} from '../../api/bookings.js';
+import {isEnabled,notificationsFor,requiredSettings,smsSettings,smsRecipients,validateBooking} from '../../backend/bookings.js';
+import {createProviders,dispatchNotifications} from '../../backend/notifications.js';
 
 const id='77288af4-3240-4e88-b964-5a955fc70dc9';
-const env={...Object.fromEntries(requiredSettings.map(key=>[key,'test-only'])),BOOKING_NOTIFICATIONS_ENABLED:'true',SITE_URL:'https://clean.example',BOOKING_FROM_EMAIL:'Bookings <bookings@clean.example>',MONGO_URI:'mongodb://localhost:27017/asepsis'};
+const env={...Object.fromEntries([...requiredSettings,...smsSettings].map(key=>[key,'test-only'])),BOOKING_SMS_ENABLED:'true',BOOKING_NOTIFICATIONS_ENABLED:'true',SITE_URL:'https://clean.example',BOOKING_FROM_EMAIL:'Bookings <bookings@clean.example>',MONGO_URI:'mongodb://localhost:27017/asepsis'};
 const payload=()=>({id,type:'home',customer:{name:'Test Customer',email:'customer@example.com',phone:'4055550123',property:'Edmond',date:'',notes:''},details:{bedrooms:3,service:'standard',frequency:'fortnightly',fullBaths:2,halfBaths:0,sqft:2000,windows:0,laundry:0,addons:[]}});
 function memoryStore(){
   const records=new Map(),pending=new Set(),locks=new Set();
@@ -28,6 +28,39 @@ test('online submission is disabled unless all server settings are present',()=>
   assert.equal(isEnabled(env),true);
   assert.equal(isEnabled({...env,TWILIO_AUTH_TOKEN:''}),false);
   assert.equal(isEnabled({...env,BOOKING_NOTIFICATIONS_ENABLED:'false'}),false);
+});
+
+test('email-only requests save first, send once and need no Twilio configuration',async()=>{
+  const emailEnv={...env,BOOKING_SMS_ENABLED:'false',TWILIO_ACCOUNT_SID:'',TWILIO_AUTH_TOKEN:'',TWILIO_MESSAGING_SERVICE_SID:'',ADDITIONAL_SMS_RECIPIENTS:'invalid-unused-number'};
+  assert.equal(isEnabled(emailEnv),true);
+  assert.equal(isEnabled({...emailEnv,RESEND_API_KEY:''}),false);
+  const store=memoryStore(),calls=[];
+  const providers=createProviders(emailEnv,async(url,options)=>{
+    assert.ok(store.records.has(id));
+    assert.ok(url.includes('resend.com'));
+    calls.push(JSON.parse(options.body));
+    return {ok:true,json:async()=>({id:'email-only-id'})};
+  });
+  const handler=createBookingHandler({env:emailEnv,storeFactory:()=>store,providerFactory:()=>providers});
+  assert.equal((await request(handler)).status,202);
+  assert.equal((await request(handler)).status,202);
+  assert.equal(calls.length,1);
+  assert.deepEqual(calls[0].to,['asepsiscleaningservices@gmail.com']);
+  assert.deepEqual(Object.keys(store.records.get(id).notifications),['email']);
+  assert.equal(store.records.get(id).notifications.email.status,'accepted');
+  assert.equal(store.pendingIds.size,0);
+  assert.deepEqual(await providers.sms(validateBooking(payload())),{status:'skipped'});
+  assert.equal(calls.length,1);
+});
+
+test('SMS is opt-in and email-only failures retain the saved request',async()=>{
+  const emailEnv={...env,BOOKING_SMS_ENABLED:undefined};
+  const store=memoryStore();
+  const handler=createBookingHandler({env:emailEnv,storeFactory:()=>store,providerFactory:()=>({email:async()=>({status:'retry',httpStatus:429}),sms:async()=>assert.fail('SMS must stay off')})});
+  assert.equal((await request(handler)).status,202);
+  assert.equal(store.records.get(id).notifications.email.status,'retry');
+  assert.equal(store.pendingIds.has(id),true);
+  assert.equal(store.records.get(id).notifications.sms,undefined);
 });
 
 test('MongoDB configuration is required for the booking backend',()=>{

@@ -1,6 +1,12 @@
+# Email-only activation
+
+Set `BOOKING_NOTIFICATIONS_ENABLED=true` and `BOOKING_SMS_ENABLED=false` to accept and save requests, then send email alerts without Twilio. Email-only mode requires `SITE_URL`, `MONGODB_URI` (or `MONGO_URI`), `RESEND_API_KEY`, `BOOKING_FROM_EMAIL` and `CRON_SECRET`. Twilio credentials and SMS recipient settings are ignored in this mode. Existing queued SMS attempts are skipped while SMS is disabled.
+
+For local testing, use `SITE_URL=http://127.0.0.1:5173`, start `npm run dev:backend` and `npm run dev`, and open that exact frontend URL. For production, copy settings privately to Vercel, use the exact public website origin for `SITE_URL`, then redeploy. Local `.env` changes do not activate the deployed website.
+
 # Activate booking notifications on Vercel
 
-The implementation is ready for configuration. It has not sent a live email or text. Until all required settings are present and `BOOKING_NOTIFICATIONS_ENABLED=true`, the website keeps the email-draft option.
+Each environment requires configuration and a delivery test. Until all required settings are present and `BOOKING_NOTIFICATIONS_ENABLED=true`, the website keeps the email-draft option.
 
 ## What happens when enabled
 
@@ -9,12 +15,12 @@ The implementation is ready for configuration. It has not sent a live email or t
 3. Resend is asked to send the full request to the relevant business inbox:
    - Residential: `asepsiscleaningservices@gmail.com`
    - Commercial: `asepsisedmond@gmail.com`
-4. Twilio is asked to send a brief SMS alert to **+1 405-549-7722**, identifying the request and which inbox to check. Customer addresses and access details are not included in the SMS.
+4. When `BOOKING_SMS_ENABLED=true`, Twilio is asked to send a brief SMS alert to **+1 405-549-7722**, identifying the request and which inbox to check. Customer addresses and access details are not included in the SMS.
 5. The customer receives a request reference. The appointment is still subject to your team's availability confirmation; this does not reserve a calendar slot or take payment.
 
 ## Accounts to set up
 
-### 1. Twilio for SMS
+### Optional: Twilio for SMS
 
 Create a [Twilio account and Messaging Service](https://www.twilio.com/docs/messaging/tutorials/send-messages-with-messaging-services), and add an eligible SMS-capable sending number to that service. Your existing **+1 405-549-7722** remains the recipient, not the Twilio sending number.
 
@@ -43,30 +49,31 @@ In **Project → Settings → Environment Variables**, add the following to **Pr
 | `SITE_URL` | Your exact canonical production origin, e.g. `https://www.your-domain.com`, matching where customers submit the form |
 | `RESEND_API_KEY` | Resend API key |
 | `BOOKING_FROM_EMAIL` | Your verified sending address, optionally with a display name |
-| `TWILIO_ACCOUNT_SID` | Twilio Account SID |
-| `TWILIO_AUTH_TOKEN` | Twilio Auth Token |
-| `TWILIO_MESSAGING_SERVICE_SID` | Messaging Service SID with an approved sender |
+| `BOOKING_SMS_ENABLED` | `false` for email only; `true` after Twilio is ready |
+| `TWILIO_ACCOUNT_SID` | Required only for SMS: Twilio Account SID |
+| `TWILIO_AUTH_TOKEN` | Required only for SMS: Twilio Auth Token |
+| `TWILIO_MESSAGING_SERVICE_SID` | Required only for SMS: Messaging Service SID with an approved sender |
 | `ADDITIONAL_SMS_RECIPIENTS` | Optional additional business alert numbers, comma-separated in international format. The original +14055497722 remains included. |
 | `MONGODB_URI` | MongoDB connection string |
 | `MONGODB_DB` | Optional database name, defaults to `asepsis` |
 | `CRON_SECRET` | A randomly generated secret of at least 32 characters |
-| `BOOKING_NOTIFICATIONS_ENABLED` | `true` when all services are configured |
+| `BOOKING_NOTIFICATIONS_ENABLED` | `true` when MongoDB and email are configured (and Twilio if SMS is enabled) |
 
 Deploy the repository changes and redeploy after changing variables. The project remains a Vite application; files in `api/` become Vercel Functions. No custom SPA rewrite should intercept `/api/*`. Hash page URLs do not require an SPA rewrite. See [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite) and [Vercel environment variables](https://vercel.com/docs/environment-variables).
 
 Each SMS recipient has its own saved delivery status and provider ID. A retry for one failed recipient does not resend alerts already accepted for another recipient. Recipients are fixed when a request is created; changing the list affects new requests. Removed recipients will not receive new attempts. The additional Nigerian recipient has been confirmed and saved privately in the git-ignored `.env.local` file. Copy its `ADDITIONAL_SMS_RECIPIENTS` setting into Vercel's Production environment when activating notifications. Do not add this private number to public site configuration, frontend code, example environment files or tracked documentation. This setting is server-only and must never have a `VITE_` prefix.
 
-Production secrets should not be set for preview deployments. If testing a preview integration, use isolated test credentials, database and origin. Normal `npm run dev` serves only the frontend; it falls back to email without a local function server. Browser tests mock `/api/bookings`. Use the Vercel CLI's local development environment if you need to exercise real functions locally.
+Production secrets should not be set for preview deployments. If testing a preview integration, use isolated test credentials, database and origin. For local development, run `npm run dev:backend` with server settings in `.env`, then `npm run dev` in a second terminal. Vite proxies `/api` requests to the backend on port 4000. Set `SITE_URL` to the exact local frontend origin. Browser tests mock `/api/bookings`. Use the Vercel CLI's local development environment if you need to exercise real functions locally.
 
 ## Test activation
 
 1. Check that `/api/bookings` returns `{"enabled":true}`. This confirms configuration presence, **not** provider credential validity.
-2. Submit one clearly labelled test residential request. Confirm a record appears in MongoDB, the email reaches the residential inbox and an SMS reaches the business phone.
-3. Submit one commercial test and confirm it reaches the commercial inbox and the same phone.
+2. Submit one clearly labelled test residential request. Confirm a record appears in MongoDB, the email reaches the residential inbox and, if SMS is enabled, an SMS reaches the business phone.
+3. Submit one commercial test and confirm it reaches the commercial inbox and, if SMS is enabled, the same phone.
 4. Check Resend and Twilio delivery dashboards. An API-accepted message can still bounce or fail later at the destination; this implementation records provider acceptance and IDs, not later delivery receipts. Provider dashboards are the authority for final delivery status.
 5. Check that the website displays a request reference and does not claim an appointment has been confirmed.
 
-Do not consider alerts live until the two delivery tests pass. The automated tests use mocked providers and do not send anything or incur messaging charges.
+Do not consider alerts live until both service types pass delivery tests for each enabled channel. The automated tests use mocked providers and do not send anything or incur messaging charges.
 
 ## Failed notifications and recovery
 
@@ -77,7 +84,7 @@ Do not consider alerts live until the two delivery tests pass. The automated tes
 - `vercel.json` includes a **daily 15:00 UTC** backstop at `/api/retry-notifications`. It processes up to two pending requests per run. Vercel's Hobby cron timing may be delayed; it is not a real-time delivery guarantee. Review [Vercel's cron plan limits](https://vercel.com/docs/cron-jobs/usage-and-pricing) before increasing frequency. Normal alerts are attempted immediately during submission.
 - An administrator can invoke the same GET endpoint using `Authorization: Bearer <CRON_SECRET>` to process another batch. Never put this secret in a URL or public browser code.
 - Timeouts, interrupted sends and ambiguous provider responses are marked `uncertain`. They are **not** blindly retried, because a provider may already have accepted the message. Definitive non-rate-limit provider errors are marked `failed`.
-- Watch Vercel logs for `Notification needs attention` / `Notification needs review`, then inspect the record and provider dashboards. Logs contain references and states, not customer contact details or credentials. If a delivery needs manual follow-up, contact the customer from the saved record; do not ask them to submit again. After confirming no delivery took place and fixing the cause, an administrator may reset that channel to `pending` with `attempts: 0` and re-add the request ID to `asepsis:notification-queue` in Redis.
+- Watch Vercel logs for `Notification needs attention` / `Notification needs review`, then inspect the record and provider dashboards. Logs contain references and states, not customer contact details or credentials. If a delivery needs manual follow-up, contact the customer from the saved record; do not ask them to submit again. After confirming no delivery took place and fixing the cause, an administrator may reset that channel to `pending` with `attempts: 0` and set `notificationPending: true` on the saved MongoDB booking record.
 - Duplicate submissions reuse a UUID and cannot create a second record with the same ID. Altered payloads with a reused ID are rejected. The browser retains its retry ID while the page is open; refreshing or starting a new request creates a new ID.
 - Cost guardrails limit new requests to five per IP window (one hour) and fifty per global window (24 hours). Existing IDs are not counted twice. Windows start with the first accepted request. Requests over those limits show a call/email alternative. These limits help bound abuse but do not replace monitoring or Vercel firewall rules.
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import posts from '../content/blog.json';
-import { formatPostDate, galleryPhotos, publishedPosts, publishingSchedule, reviews } from './content';
-import { contactFor, phone } from './site-config';
+import posts from '../../content/blog.json';
+import { formatPostDate, galleryPhotos, publishedPosts, publishingSchedule, reviews } from '../lib/content';
+import { contactFor, phone } from '../../shared/site-config';
 
 function PageHeading({ label, title, accent, children }) {
   return <section className="page-hero community-hero"><div className="eyebrow">{label}</div><h1>{title}<br/><em>{accent}</em></h1>{children}</section>;

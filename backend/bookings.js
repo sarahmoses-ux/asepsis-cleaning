@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto';
-import { estimate, extras } from '../src/pricing.js';
-import { contactFor } from '../src/site-config.js';
+import { estimate, extras } from '../shared/pricing.js';
+import { contactFor } from '../shared/site-config.js';
 
 export const ownerPhone = '+14055497722';
+export const smsSettings = ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_MESSAGING_SERVICE_SID'];
+export function smsEnabled(env) { return env.BOOKING_SMS_ENABLED === 'true'; }
 export function smsRecipients(env) {
   const additional=(env.ADDITIONAL_SMS_RECIPIENTS||'').split(',').map(value=>value.trim()).filter(Boolean);
   const recipients=[...new Set([ownerPhone,...additional])];
@@ -10,15 +12,18 @@ export function smsRecipients(env) {
   return recipients;
 }
 export function notificationStates(env) {
-  return {email:{status:'pending',attempts:0},...Object.fromEntries(smsRecipients(env).map((to,index)=>[index===0?'sms':`sms_${index}`,{status:'pending',attempts:0,to}]))};
+  return {email:{status:'pending',attempts:0},...(smsEnabled(env) ? Object.fromEntries(smsRecipients(env).map((to,index)=>[index===0?'sms':`sms_${index}`,{status:'pending',attempts:0,to}])) : {})};
 }
 export const retentionSeconds = 90 * 24 * 60 * 60;
-export const requiredSettings = ['SITE_URL', 'RESEND_API_KEY', 'BOOKING_FROM_EMAIL', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_MESSAGING_SERVICE_SID', 'CRON_SECRET'];
+export const requiredSettings = ['SITE_URL', 'RESEND_API_KEY', 'BOOKING_FROM_EMAIL', 'CRON_SECRET'];
 export function mongoUri(env) {
   return env.MONGODB_URI || env.MONGO_URI || '';
 }
 export function isEnabled(env) {
-  try { smsRecipients(env); } catch { return false; }
+  if (smsEnabled(env)) {
+    try { smsRecipients(env); } catch { return false; }
+    if (!smsSettings.every(key => Boolean(env[key]?.trim()))) return false;
+  }
   return env.BOOKING_NOTIFICATIONS_ENABLED === 'true' && requiredSettings.every(key => Boolean(env[key]?.trim())) && Boolean(mongoUri(env).trim());
 }
 export class BookingError extends Error {
@@ -86,7 +91,6 @@ export function validateBooking(body, now = new Date()) {
 }
 export function fingerprint(booking) { return createHash('sha256').update(JSON.stringify(booking)).digest('hex'); }
 export function notificationsFor(record, env, recipient=ownerPhone) {
-  if(!smsRecipients(env).includes(recipient)) throw new Error('SMS recipient is not configured');
   const contact = contactFor(record.type);
   const lines = [
     `New ${record.type === 'home' ? 'residential' : 'commercial'} booking request`,

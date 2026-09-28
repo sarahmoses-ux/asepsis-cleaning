@@ -1,4 +1,4 @@
-import { notificationsFor, ownerPhone } from './bookings.js';
+import { notificationsFor, ownerPhone, smsEnabled, smsRecipients } from './bookings.js';
 
 export function createProviders(env, fetcher=fetch) {
   async function send(url,options,idField) {
@@ -15,9 +15,13 @@ export function createProviders(env, fetcher=fetch) {
       return send('https://api.resend.com/emails',{method:'POST',headers:{Authorization:`Bearer ${env.RESEND_API_KEY}`,'Content-Type':'application/json','Idempotency-Key':`booking-${record.id}`},body:JSON.stringify(notificationsFor(record,env).email)},'id');
     },
     sms(record,recipient=ownerPhone) {
+      if(!smsEnabled(env)) return Promise.resolve({status:'skipped'});
       if(!record) return Promise.resolve({status:'failed'});
       let message;
-      try { message=notificationsFor(record,env,recipient).sms; } catch { return Promise.resolve({status:'failed'}); }
+      try {
+        if(!smsRecipients(env).includes(recipient)) return Promise.resolve({status:'failed'});
+        message=notificationsFor(record,env,recipient).sms;
+      } catch { return Promise.resolve({status:'failed'}); }
       return send(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(env.TWILIO_ACCOUNT_SID)}/Messages.json`,{method:'POST',headers:{Authorization:'Basic '+Buffer.from(`${env.TWILIO_ACCOUNT_SID}:${env.TWILIO_AUTH_TOKEN}`).toString('base64'),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(message).toString()},'sid');
     },
   };

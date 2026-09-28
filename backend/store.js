@@ -15,9 +15,13 @@ async function getDatabase(env) {
   return client.db(env.MONGODB_DB || env.MONGODB_DATABASE || 'asepsis');
 }
 
-export function createStore(env) {
+export function createStore(env, database = () => getDatabase(env)) {
+  let indexes;
   async function bookings() {
-    return (await getDatabase(env)).collection('bookings');
+    const collection = (await database()).collection('bookings');
+    indexes ??= collection.createIndex({ id: 1 }, { unique: true }).catch(error => { indexes = null; throw error; });
+    await indexes;
+    return collection;
   }
 
   async function limits() {
@@ -52,7 +56,7 @@ export function createStore(env) {
           limitStore.updateOne({ _id: ipKey }, { $inc: { count: 1 }, $setOnInsert: { createdAt: new Date() } }, { upsert: true }),
           limitStore.updateOne({ _id: 'global' }, { $inc: { count: 1 }, $setOnInsert: { createdAt: new Date() } }, { upsert: true }),
         ]);
-        await collection.insertOne({ ...record, createdAt: new Date(), updatedAt: new Date() });
+      await collection.insertOne({ ...record, notificationPending: true, createdAt: new Date(), updatedAt: new Date() });
         return 'created';
       } catch (error) {
         if (error.code === 11000) return 'existing';
@@ -65,15 +69,18 @@ export function createStore(env) {
       if (result.matchedCount === 0) throw new Error('Booking record expired');
     },
     async removePending(id) {
+      await (await bookings()).updateOne({ id }, { $set: { notificationPending: false } });
       const collection = await queue();
       await collection.deleteOne({ _id: id });
     },
     async pending(limit = 10) {
+      const saved = await (await bookings()).find({ notificationPending: true }, { sort: { updatedAt: 1 }, limit }).toArray();
       const collection = await queue();
       const docs = await collection.find({}, { sort: { queuedAt: 1 }, limit }).toArray();
-      return docs.map(doc => doc._id);
+      return [...new Set([...saved.map(doc => doc.id), ...docs.map(doc => doc._id)])].slice(0, limit);
     },
     async defer(id) {
+      await (await bookings()).updateOne({ id }, { $set: { notificationPending: true, updatedAt: new Date() } });
       const collection = await queue();
       await collection.updateOne({ _id: id }, { $set: { queuedAt: Date.now() } }, { upsert: true });
     },
@@ -85,7 +92,7 @@ export function createStore(env) {
         { $set: { lockToken: token, lockUntil: new Date(Date.now() + 90_000) } },
         { returnDocument: 'after' },
       );
-      return result.value ? token : null;
+      return result ? token : null;
     },
     async unlock(id, token) {
       const collection = await bookings();

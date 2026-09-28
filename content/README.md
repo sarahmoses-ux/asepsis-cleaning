@@ -16,13 +16,13 @@ Approved articles are included in the static site build and become visible when 
 
 # Gallery and reviews
 
-Edit `galleryPhotos` and `reviews` in `src/content.js`. Current photos are illustrative stock interiors and are labelled accordingly. Add customer-approved project photography with accurate captions before presenting it as completed work.
+Edit `galleryPhotos` and `reviews` in `src/lib/content.js`. Current photos are illustrative stock interiors and are labelled accordingly. Add customer-approved project photography with accurate captions before presenting it as completed work.
 
 Reviews must be genuine, permissioned feedback. Entries use `id`, `text`, `name`, `service` and a real `sourceUrl`. The public feedback form creates an email for the visitor to send. It does not automatically save submissions or publish reviews. Publishing consent is optional and unchecked by default.
 
 # Contact routing
 
-`src/site-config.js` is the source of truth:
+`shared/site-config.js` is the source of truth:
 
 - Residential: Asepsis Cleaning Services — asepsiscleaningservices@gmail.com
 - Commercial: Asepsis Edmond — asepsisedmond@gmail.com
