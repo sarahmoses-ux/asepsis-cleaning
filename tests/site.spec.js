@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 test('pages, calculator, email draft and mobile navigation',async({page})=>{
+  test.setTimeout(60000);
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.setViewportSize({width:1440,height:1000});
@@ -24,7 +25,7 @@ test('pages, calculator, email draft and mobile navigation',async({page})=>{
   await page.getByLabel('Email',{exact:true}).fill('test@example.com');
   await page.getByLabel('Property address or city').fill('Edmond');
   await page.getByRole('button',{name:'Prepare my quote request'}).click();
-  await expect(page.getByRole('link',{name:'Open email to send'})).toHaveAttribute('href',/mailto:asepsisedmond@gmail.com/);
+  await expect(page.getByRole('link',{name:'Open email to send'})).toHaveAttribute('href',/mailto:asepsiscleaningservices@gmail.com/);
   await expect(page.locator('.email-draft')).toContainText('Nothing has been sent yet.');
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');

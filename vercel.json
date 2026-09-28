@@ -1,0 +1,5 @@
+{
+  "framework": "vite",
+  "functions": { "api/*.js": { "maxDuration": 60 } },
+  "crons": [{ "path": "/api/retry-notifications", "schedule": "0 15 * * *" }]
+}
