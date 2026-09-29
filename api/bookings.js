@@ -1,6 +1,7 @@
 import { BookingError, fingerprint, isEnabled, notificationStates, validateBooking } from '../backend/bookings.js';
 import { createStore } from '../backend/store.js';
 import { createProviders, dispatchNotifications } from '../backend/notifications.js';
+import { bookingToken, paymentsEnabled } from '../backend/payments.js';
 
 export function createBookingHandler({env=process.env,storeFactory=createStore,providerFactory=createProviders,dispatch=dispatchNotifications}={}) {
   return async function handler(req,res) {
@@ -8,7 +9,7 @@ export function createBookingHandler({env=process.env,storeFactory=createStore,p
     res.setHeader('X-Content-Type-Options','nosniff');
     if(req.method==='GET') return res.status(200).json({enabled:isEnabled(env)});
     if(req.method!=='POST') { res.setHeader('Allow','GET, POST'); return res.status(405).json({error:'Method not allowed.'}); }
-    if(!isEnabled(env)) return res.status(503).json({error:'Online requests are not available yet. Please email or call our team.'});
+    if(!isEnabled(env)) return res.status(503).json({error:'Online booking is temporarily unavailable. Your request has not been saved. Please try again shortly or call our team.'});
     const deadline=Date.now()+45000;
     try {
       if(req.headers.origin !== new URL(env.SITE_URL).origin) throw new BookingError(403,'Please submit your request from our website.');
@@ -24,14 +25,16 @@ export function createBookingHandler({env=process.env,storeFactory=createStore,p
       const result=await store.create(record,ip);
       if(result==='limited') throw new BookingError(429,'Too many requests. Please call 405-549-7722 for help.');
       if(!['created','existing'].includes(result)) throw new Error('Booking persistence was not confirmed');
+      let summary=booking;
       if(result==='existing') {
         const saved=await store.get(booking.id);
         if(saved?.fingerprint!==hash) throw new BookingError(409,'This request reference has already been used. Please refresh before starting a different request.');
+        summary={id:saved.id,type:saved.type,customer:saved.customer,details:saved.details,pricing:saved.pricing};
       }
       // The request is saved first. Notification failures never erase it or ask the customer to resubmit.
       try { await dispatch(booking.id,store,providerFactory(env),{deadline}); }
       catch { console.error('Booking saved; notification processing needs attention',{id:booking.id}); }
-      return res.status(202).json({id:booking.id,status:'requested',message:'Your request has been received. Our team will contact you to confirm availability.'});
+      return res.status(202).json({id:booking.id,status:'requested',booking:summary,accessToken:bookingToken(booking.id,env),paymentAvailable:paymentsEnabled(env),message:'Your request has been received. Our team will contact you to confirm availability.'});
     } catch(error) {
       if(error instanceof BookingError) return res.status(error.status).json({error:error.message});
       console.error('Booking service unavailable');

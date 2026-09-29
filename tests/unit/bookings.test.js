@@ -45,7 +45,7 @@ test('email-only requests save first, send once and need no Twilio configuration
   assert.equal((await request(handler)).status,202);
   assert.equal((await request(handler)).status,202);
   assert.equal(calls.length,1);
-  assert.deepEqual(calls[0].to,['asepsiscleaningservices@gmail.com']);
+  assert.deepEqual(calls[0].to,['asepsisedmond@gmail.com']);
   assert.deepEqual(Object.keys(store.records.get(id).notifications),['email']);
   assert.equal(store.records.get(id).notifications.email.status,'accepted');
   assert.equal(store.pendingIds.size,0);
@@ -82,15 +82,15 @@ test('booking days are Monday through Saturday and arrival windows are limited t
   const nextSunday = new Date(today);
   while (new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'America/Chicago' }).format(nextSunday) !== 'Sunday') nextSunday.setDate(nextSunday.getDate() + 1);
   const isoSunday = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(nextSunday).replace('/', '-').replace('/', '-');
-  const valid=validateBooking({...payload(),customer:{...payload().customer,date:'2026-09-28',arrival:'9-10am'}});
+  const valid=validateBooking({...payload(),customer:{...payload().customer,date:'2026-09-28',arrival:'9-10am'}},new Date('2026-09-28T12:00:00Z'));
   assert.equal(valid.customer.arrival,'9-10am');
   assert.throws(()=>validateBooking({...payload(),customer:{...payload().customer,date:isoSunday,arrival:'9-10am'}}),/Sunday/);
-  assert.throws(()=>validateBooking({...payload(),customer:{...payload().customer,date:'2026-09-28',arrival:'8-9am'}}),/9:00 AM|12:00 PM|3:00 PM/);
+  assert.throws(()=>validateBooking({...payload(),customer:{...payload().customer,date:'2026-09-28',arrival:'8-9am'}},new Date('2026-09-28T12:00:00Z')),/9:00 AM|12:00 PM|3:00 PM/);
 });
-test('notification recipients are fixed server-side and depend on the service',()=>{
+test('notification recipients are fixed server-side and share one business inbox',()=>{
   const record=validateBooking({...payload(),to:'attacker@example.com'});
   const home=notificationsFor(record,env);
-  assert.deepEqual(home.email.to,['asepsiscleaningservices@gmail.com']);
+  assert.deepEqual(home.email.to,['asepsisedmond@gmail.com']);
   assert.equal(home.email.reply_to,'customer@example.com');
   assert.equal(home.sms.To,'+14055497722');
   assert.ok(!home.sms.Body.includes('Edmond'));
@@ -103,6 +103,9 @@ test('booking is persisted before providers run and duplicate submissions send o
   const handler=createBookingHandler({env,storeFactory:()=>store,providerFactory:()=>providers});
   const results=await Promise.all([request(handler),request(handler)]);
   assert.ok(results.every(result=>result.status===202));
+  assert.equal(results[0].data.booking.pricing.firstVisit,305);
+  assert.equal(typeof results[0].data.accessToken,'string');
+  assert.equal(results[0].data.paymentAvailable,false);
   assert.deepEqual(calls,['email','sms']);
   assert.equal(store.records.size,1);
   const altered=payload();altered.customer.name='Different request';
@@ -146,7 +149,7 @@ test('provider adapters send email and SMS independently without exposing creden
   const record=validateBooking(payload());
   assert.equal((await providers.email(record)).status,'accepted');
   assert.equal((await providers.sms(record)).status,'accepted');
-  assert.equal(JSON.parse(calls[0].options.body).to[0],'asepsiscleaningservices@gmail.com');
+  assert.equal(JSON.parse(calls[0].options.body).to[0],'asepsisedmond@gmail.com');
   assert.equal(calls[0].options.headers['Idempotency-Key'],'booking-'+id);
   assert.equal(new URLSearchParams(calls[1].options.body).get('To'),'+14055497722');
   const result=await request(createBookingHandler({env}),null,{method:'GET'});

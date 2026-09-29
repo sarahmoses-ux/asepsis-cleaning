@@ -1,6 +1,7 @@
+export const businessEmail = 'asepsisedmond@gmail.com';
 export const contacts = {
-  residential: { name: 'Asepsis Cleaning Services', email: 'asepsiscleaningservices@gmail.com' },
-  commercial: { name: 'Asepsis Edmond', email: 'asepsisedmond@gmail.com' },
+  residential: { name: 'Asepsis Cleaning Services', email: businessEmail },
+  commercial: { name: 'Asepsis Edmond', email: businessEmail },
 };
 export const locationLabel = 'Location: Oklahoma';
 export const phone = '405-549-7722';

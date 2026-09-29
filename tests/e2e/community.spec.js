@@ -44,7 +44,7 @@ test('review feedback preserves optional consent and routes by service', async (
   const consent = page.getByRole('checkbox');
   await expect(consent).not.toBeChecked();
   await page.getByRole('button', { name: 'Prepare feedback' }).click();
-  await expect(page.getByRole('link', { name: 'Open email to send' })).toHaveAttribute('href', /^mailto:asepsiscleaningservices@gmail.com/);
+  await expect(page.getByRole('link', { name: 'Open email to send' })).toHaveAttribute('href', /^mailto:asepsisedmond@gmail.com/);
   await page.getByText('Read feedback text', { exact: true }).click();
   await expect(page.locator('.feedback-draft pre')).toContainText('No, private feedback only');
   await page.getByRole('combobox', { name: /^Service/ }).selectOption('project');
@@ -73,9 +73,9 @@ test('new pages fit desktop and mobile and do not show the former business addre
   await page.getByLabel('Phone', { exact: true }).fill('4055550123');
   await page.getByLabel('Email', { exact: true }).fill('project@example.com');
   await page.getByLabel('Property address or city').fill('Oklahoma City');
-  await page.getByRole('button', { name: 'Prepare my quote request' }).click();
-  await expect(page.getByRole('link', { name: 'Open email to send' })).toHaveAttribute('href', /^mailto:asepsisedmond@gmail.com/);
+  await expect(page.getByRole('button', { name: 'Continue to review & payment' })).toBeVisible();
+  await expect(page.locator('.quote-layout a[href^="mailto:"]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Home cleaning', exact: true }).click();
-  await expect(page.locator('.contact-box')).toContainText('asepsiscleaningservices@gmail.com');
+  await expect(page.locator('.contact-box')).toContainText('asepsisedmond@gmail.com');
   expect(errors).toEqual([]);
 });

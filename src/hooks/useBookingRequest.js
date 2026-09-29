@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { apiUrl, readResponse } from '../lib/api';
 
 export function useBookingRequest() {
   const [enabled,setEnabled]=useState(false);
@@ -9,7 +10,7 @@ export function useBookingRequest() {
   const submitting=useRef(false);
   useEffect(()=>{
     const controller=new AbortController();
-    fetch('/api/bookings',{signal:controller.signal,cache:'no-store'})
+    fetch(apiUrl('/api/bookings'),{signal:controller.signal,cache:'no-store'})
       .then(response=>response.ok ? response.json() : null)
       .then(data=>{if(!controller.signal.aborted) setEnabled(data?.enabled===true);})
       .catch(()=>{});
@@ -18,13 +19,14 @@ export function useBookingRequest() {
   async function submit(payload) {
     if(submitting.current) return;
     submitting.current=true;setBusy(true);setError('');
-    const signature=JSON.stringify(payload);
-    if(!attempt.current || attempt.current.signature!==signature) attempt.current={signature,id:crypto.randomUUID()};
     try {
-      const response=await fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,id:attempt.current.id}),signal:AbortSignal.timeout(55000)});
-      const data=await response.json();
+      const signature=JSON.stringify(payload);
+      if(!attempt.current || attempt.current.signature!==signature) attempt.current={signature,id:crypto.randomUUID()};
+      const response=await fetch(apiUrl('/api/bookings'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,id:attempt.current.id}),signal:AbortSignal.timeout(55000)});
+      const data=await readResponse(response);
       if(!response.ok || data.status!=='requested' || data.id!==attempt.current.id) throw new Error(data.error||'We could not confirm receipt. Please retry or call our team.');
       setReceipt(data);
+      return data;
     } catch(error) {
       setError(error.name==='TimeoutError' || error instanceof TypeError ? 'We could not confirm receipt. Please retry without changing the details, or call 405-549-7722. A retry will use the same request reference.' : error.message);
     } finally {submitting.current=false;setBusy(false);}

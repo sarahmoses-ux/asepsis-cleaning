@@ -33,6 +33,15 @@ export function createStore(env, database = () => getDatabase(env)) {
   }
 
   return {
+    async setPayment(id, payment) {
+      const collection = await bookings();
+      // Confirm payment and enqueue its alert together. Repeated webhooks never reset a sent alert.
+      const result = await collection.updateOne({ id, 'payment.status':{$ne:'paid'} }, { $set: {
+        payment, updatedAt: new Date(),
+        ...(payment.status==='paid' ? { 'notifications.payment_email':{status:'pending',attempts:0}, notificationPending:true } : {}),
+      } });
+      if (!result.matchedCount && !(await collection.findOne({id,'payment.status':'paid'}))) throw new Error('Booking not found');
+    },
     async get(id) {
       const collection = await bookings();
       const record = await collection.findOne({ id });
@@ -65,11 +74,16 @@ export function createStore(env, database = () => getDatabase(env)) {
     },
     async save(record) {
       const collection = await bookings();
-      const result = await collection.updateOne({ id: record.id }, { $set: { ...record, updatedAt: new Date() } });
+      // Notification processing must not overwrite a concurrent payment update.
+      const channels = Object.fromEntries(Object.entries(record.notifications).map(([channel,state])=>[`notifications.${channel}`,state]));
+      const result = await collection.updateOne({ id: record.id }, { $set: { ...channels, updatedAt: new Date() } });
       if (result.matchedCount === 0) throw new Error('Booking record expired');
     },
     async removePending(id) {
-      await (await bookings()).updateOne({ id }, { $set: { notificationPending: false } });
+      // A payment webhook may have added an alert while the request email was being sent.
+      const channels=['email','sms','sms_1','sms_2','sms_3','payment_email'];
+      const result=await (await bookings()).updateOne({ id, $nor:channels.map(channel=>({[`notifications.${channel}.status`]:{$in:['pending','retry','sending']}})) }, { $set: { notificationPending: false } });
+      if(!result.matchedCount) return;
       const collection = await queue();
       await collection.deleteOne({ _id: id });
     },

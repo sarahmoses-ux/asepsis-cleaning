@@ -24,7 +24,7 @@ Reviews must be genuine, permissioned feedback. Entries use `id`, `text`, `name`
 
 `shared/site-config.js` is the source of truth:
 
-- Residential: Asepsis Cleaning Services — asepsiscleaningservices@gmail.com
+- Residential: Asepsis Cleaning Services — asepsisedmond@gmail.com
 - Commercial: Asepsis Edmond — asepsisedmond@gmail.com
 - Public location: Location: Oklahoma
 

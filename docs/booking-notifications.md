@@ -6,17 +6,15 @@ For local testing, use `SITE_URL=http://127.0.0.1:5173`, start `npm run dev:back
 
 # Activate booking notifications on Vercel
 
-Each environment requires configuration and a delivery test. Until all required settings are present and `BOOKING_NOTIFICATIONS_ENABLED=true`, the website keeps the email-draft option.
+Each environment requires configuration and a delivery test. Until all required settings are present and `BOOKING_NOTIFICATIONS_ENABLED=true`, the website displays an online-booking error and retains the customer details.
 
 ## What happens when enabled
 
 1. The customer submits a home or commercial booking request on the website.
 2. A Vercel Function validates the request, calculates any residential estimate from the server's price table, and saves the request in MongoDB.
-3. Resend is asked to send the full request to the relevant business inbox:
-   - Residential: `asepsiscleaningservices@gmail.com`
-   - Commercial: `asepsisedmond@gmail.com`
+3. Resend is asked to send the full request to the shared business inbox, `asepsisedmond@gmail.com`, for both residential and commercial requests
 4. When `BOOKING_SMS_ENABLED=true`, Twilio is asked to send a brief SMS alert to **+1 405-549-7722**, identifying the request and which inbox to check. Customer addresses and access details are not included in the SMS.
-5. The customer receives a request reference. The appointment is still subject to your team's availability confirmation; this does not reserve a calendar slot or take payment.
+5. The customer receives a request reference. The appointment is still subject to your team's availability confirmation; this does not reserve a calendar slot. Customers continue to the review and optional payment page; see `booking-payments.md`.
 
 ## Accounts to set up
 
@@ -32,7 +30,7 @@ Record the Account SID, Auth Token and Messaging Service SID in Vercel, not in s
 
 Create a [Resend account](https://resend.com/docs/api-reference/emails/send-email), verify a domain you control, and create an API key. Use a sender such as `Asepsis Bookings <bookings@your-domain.com>`.
 
-Your two Gmail addresses are the **recipients**. They are not the Resend sending domain. A shared `vercel.app` subdomain is also not a domain you can verify as your own mail sender. If you do not own a domain yet, obtain one or choose a different email integration before activation. Resend's test sender has recipient restrictions; test both business inboxes using the verified production sender.
+Your Gmail address is the **recipient**. It is not the Resend sending domain. A shared `vercel.app` subdomain is also not a domain you can verify as your own mail sender. If you do not own a domain yet, obtain one or choose a different email integration before activation. Resend's test sender has recipient restrictions; test both service types with the shared business inbox using the verified production sender.
 
 ### 3. MongoDB for saved requests
 
@@ -68,8 +66,8 @@ Production secrets should not be set for preview deployments. If testing a previ
 ## Test activation
 
 1. Check that `/api/bookings` returns `{"enabled":true}`. This confirms configuration presence, **not** provider credential validity.
-2. Submit one clearly labelled test residential request. Confirm a record appears in MongoDB, the email reaches the residential inbox and, if SMS is enabled, an SMS reaches the business phone.
-3. Submit one commercial test and confirm it reaches the commercial inbox and, if SMS is enabled, the same phone.
+2. Submit one clearly labelled test residential request. Confirm a record appears in MongoDB, the email reaches `asepsisedmond@gmail.com` and, if SMS is enabled, an SMS reaches the business phone.
+3. Submit one commercial test and confirm it reaches `asepsisedmond@gmail.com` and, if SMS is enabled, the same phone.
 4. Check Resend and Twilio delivery dashboards. An API-accepted message can still bounce or fail later at the destination; this implementation records provider acceptance and IDs, not later delivery receipts. Provider dashboards are the authority for final delivery status.
 5. Check that the website displays a request reference and does not claim an appointment has been confirmed.
 
@@ -88,4 +86,4 @@ Do not consider alerts live until both service types pass delivery tests for eac
 - Duplicate submissions reuse a UUID and cannot create a second record with the same ID. Altered payloads with a reused ID are rejected. The browser retains its retry ID while the page is open; refreshing or starting a new request creates a new ID.
 - Cost guardrails limit new requests to five per IP window (one hour) and fifty per global window (24 hours). Existing IDs are not counted twice. Windows start with the first accepted request. Requests over those limits show a call/email alternative. These limits help bound abuse but do not replace monitoring or Vercel firewall rules.
 
-The API validates origin and fields; it never lets a visitor supply the alert destination. Email goes only to the configured business inboxes and SMS only to the business phone. No customer confirmation email or customer SMS campaign is sent by this integration.
+The API validates origin and fields; it never lets a visitor supply the alert destination. Email goes only to the configured business inboxes and SMS only to the business phone. No customer confirmation email or customer SMS campaign is sent by the booking notification integration.

@@ -25,12 +25,12 @@ test('initial queue contains unique complete posts twice weekly on Monday and Th
     assert.ok(['Monday','Thursday'].includes(day));
   }
 });
-test('enquiries use the correct residential or commercial inbox',()=>{
-  assert.equal(contactFor('home').email,'asepsiscleaningservices@gmail.com');
+test('residential and commercial enquiries share the business inbox',()=>{
+  assert.equal(contactFor('home').email,'asepsisedmond@gmail.com');
   assert.equal(contactFor('project').email,'asepsisedmond@gmail.com');
 });
 test('live source no longer contains the business street address or address map link',()=>{
-  for(const file of ['../../src/App.jsx','../../src/pages/CommunityPages.jsx','../../shared/site-config.js']) {
+  for(const file of ['../../src/App.jsx','../../src/pages/Quote.jsx','../../src/pages/CommunityPages.jsx','../../shared/site-config.js']) {
     assert.doesNotMatch(readFileSync(new URL(file,import.meta.url),'utf8'),/15305|Jasper|73013/);
   }
 });

@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { MongoClient } from 'mongodb';
 import { createApiRouter } from './http.js';
+import { startNotificationWorker } from './notification-worker.js';
 
 const port = Number(process.env.PORT || 4000);
 const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || '';
@@ -44,6 +45,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 connectMongo().catch(() => undefined);
+const notificationWorker=startNotificationWorker();
+server.on('close',()=>notificationWorker.stop());
 
 server.listen(port, '0.0.0.0', () => {
   console.log(`Backend listening on http://0.0.0.0:${port}`);
