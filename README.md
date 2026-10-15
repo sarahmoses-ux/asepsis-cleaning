@@ -43,3 +43,5 @@ Keep server secrets in the ignored environment files at the project root. Run `n
 
 
 The homepage uses a dedicated `src/pages/Home.jsx` and `src/styles/home.css`, with scroll entrance animations, reduced-motion support and a keyboard-accessible room preview. `public/photos/home-hero-v2.jpg` and `cleaning-detail-v2.jpg` are optimized AI-generated illustrative images, not customer properties or staff photographs. Original PNGs are archived in `references/brand/website-imagery/` and excluded from deployment.
+
+Admin login: /admin/login or /#/admin. See [admin setup](docs/admin-access.md) for server credentials and deployment configuration.

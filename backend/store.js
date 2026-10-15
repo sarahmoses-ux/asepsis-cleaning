@@ -33,6 +33,21 @@ export function createStore(env, database = () => getDatabase(env)) {
   }
 
   return {
+    async allowAdminLogin(key) {
+      const collection = (await database()).collection('admin_login_limits');
+      const window = Math.floor(Date.now() / 900_000);
+      await collection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+      const result = await collection.findOneAndUpdate({ _id: `${key}:${window}` }, {
+        $inc: { count: 1 }, $setOnInsert: { expiresAt: new Date((window + 2) * 900_000) },
+      }, { upsert: true, returnDocument: 'after' });
+      return result.count <= 5;
+    },
+    async listAdminBookings() {
+      return (await bookings()).find({}, {
+        projection: { _id: 0, id: 1, type: 1, customer: 1, details: 1, status: 1, createdAt: 1, 'payment.status': 1 },
+        sort: { createdAt: -1 }, limit: 100,
+      }).toArray();
+    },
     async setPayment(id, payment) {
       const collection = await bookings();
       // Confirm payment and enqueue its alert together. Repeated webhooks never reset a sent alert.

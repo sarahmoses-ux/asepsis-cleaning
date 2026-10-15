@@ -2,11 +2,12 @@ import bookingHandler from '../api/bookings.js';
 import retryHandler from '../api/retry-notifications.js';
 import checkoutHandler from '../api/checkout.js';
 import webhookHandler from '../api/payment-webhook.js';
+import adminHandler from '../api/admin.js';
 
 export function createApiRouter({ bookings = bookingHandler, retry = retryHandler, checkout = checkoutHandler, webhook = webhookHandler, env = process.env } = {}) {
   return async function route(req, res) {
     const path = new URL(req.url, 'http://localhost').pathname;
-    const handler = path === '/api/bookings' ? bookings : path === '/api/retry-notifications' ? retry : path === '/api/checkout' ? checkout : path === '/api/payment-webhook' ? webhook : null;
+    const handler = path === '/api/admin' ? adminHandler : path === '/api/bookings' ? bookings : path === '/api/retry-notifications' ? retry : path === '/api/checkout' ? checkout : path === '/api/payment-webhook' ? webhook : null;
     if (!handler) return false;
     res.status = code => { res.statusCode = code; return res; };
     res.json = value => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(value)); return res; };
