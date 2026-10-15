@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { passwordHash, passwordMatches, issueSession, validSession } from '../../backend/admin.js';
 import { createAdminHandler } from '../../api/admin.js';
-const env = { ADMIN_EMAIL: 'owner@example.com', ADMIN_PASSWORD_HASH: passwordHash('test-password'), ADMIN_SESSION_SECRET: 'test-secret-with-at-least-32-characters', SITE_URL: 'https://example.com' };
+const env = { ADMIN_EMAIL: 'owner@example.com', ADMIN_PASSWORD_HASH: passwordHash('test-password'), ADMIN_SESSION_SECRET: 'test-secret-with-at-least-32-characters', SITE_URL: 'https://example.com', MONGODB_URI: 'mongodb://test.invalid' };
 async function call(handler, req) {
   let status = 200, data;
   const res = { setHeader() {}, status(code) { status = code; return this; }, json(value) { data = value; } };
@@ -41,4 +41,18 @@ test('login enforces origin, password, rate limits and missing configuration', a
   allowed = false;
   assert.equal((await call(handler, req)).status, 429);
   assert.equal((await call(createAdminHandler({ env: {} }), req)).status, 503);
+});
+
+test('admin reports missing site and database configuration without exposing secrets', async () => {
+  const req = { method: 'POST', headers: { origin: env.SITE_URL, 'content-type': 'application/json' }, body: { email: env.ADMIN_EMAIL, password: 'test-password' } };
+  const missingSite = await call(createAdminHandler({ env: { ...env, SITE_URL: '' } }), req);
+  assert.equal(missingSite.status, 503);
+  assert.match(missingSite.data.error, /SITE_URL/);
+  const missingDb = await call(createAdminHandler({ env: { ...env, MONGODB_URI: '' } }), req);
+  assert.equal(missingDb.status, 503);
+  assert.match(missingDb.data.error, /MONGODB_URI/);
+  const failingDb = await call(createAdminHandler({ env, storeFactory: () => ({ allowAdminLogin: async () => { throw new Error('secret connection string'); } }) }), req);
+  assert.equal(failingDb.status, 503);
+  assert.match(failingDb.data.error, /database could not be reached/);
+  assert.doesNotMatch(failingDb.data.error, /secret connection string/);
 });

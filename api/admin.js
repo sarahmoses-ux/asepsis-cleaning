@@ -9,23 +9,34 @@ export function createAdminHandler({ env = process.env, storeFactory = createSto
     if (!env.ADMIN_EMAIL || !env.ADMIN_PASSWORD_HASH || (env.ADMIN_SESSION_SECRET || '').length < 32) {
       return res.status(503).json({ error: 'Admin access has not been configured. Please contact the site owner.' });
     }
+    let stage = 'session';
     try {
       if (req.method === 'GET') {
         if (!validSession((req.headers.authorization || '').replace(/^Bearer /, ''), env)) return res.status(401).json({ error: 'Please sign in to continue.' });
+        stage = 'bookings';
+        if (!(env.MONGODB_URI || env.MONGO_URI || '').trim()) return res.status(503).json({ error: 'The admin database is not configured. Add MONGODB_URI to the backend Production environment and redeploy.' });
         const bookings = await storeFactory(env).listAdminBookings();
         return res.status(200).json({ bookings });
       }
-      if (req.headers.origin !== new URL(env.SITE_URL).origin) return res.status(403).json({ error: 'Please sign in from the Asepsis website.' });
+      stage = 'site-origin';
+      let siteOrigin;
+      try { siteOrigin = new URL(env.SITE_URL).origin; } catch { return res.status(503).json({ error: 'The website address is not configured. Set SITE_URL to your website origin in the backend Production environment and redeploy.' }); }
+      if (req.headers.origin !== siteOrigin) return res.status(403).json({ error: 'Please sign in from the Asepsis website.' });
       if (!String(req.headers['content-type'] || '').startsWith('application/json')) return res.status(415).json({ error: 'JSON required.' });
       let body;
       try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; } catch { return res.status(400).json({ error: 'Invalid request.' }); }
       if (typeof body?.email !== 'string' || typeof body?.password !== 'string' || body.password.length > 256 || body.email.length > 254) return res.status(400).json({ error: 'Enter your email and password.' });
       const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+      stage = 'login-limit';
+      if (!(env.MONGODB_URI || env.MONGO_URI || '').trim()) return res.status(503).json({ error: 'The admin database is not configured. Add MONGODB_URI to the backend Production environment and redeploy.' });
       if (!await storeFactory(env).allowAdminLogin(loginLimitKey(ip))) return res.status(429).json({ error: 'Too many sign-in attempts. Please try again in 15 minutes.' });
       const matched = passwordMatches(body.password, env.ADMIN_PASSWORD_HASH);
       if (!matched || body.email.trim().toLowerCase() !== env.ADMIN_EMAIL.toLowerCase()) return res.status(401).json({ error: 'Email or password is incorrect.' });
       return res.status(200).json({ token: issueSession(env), expiresIn: 1800 });
-    } catch { return res.status(503).json({ error: 'Admin service is unavailable. Please try again shortly.' }); }
+    } catch (error) {
+      console.error('Admin service failure', { stage, type: error?.name || 'Error', code: typeof error?.code === 'number' ? error.code : undefined });
+      return res.status(503).json({ error: ['login-limit', 'bookings'].includes(stage) ? 'The admin database could not be reached. Please ask the site owner to check the production MongoDB connection and database permissions.' : 'Admin service is unavailable. Please try again shortly.' });
+    }
   };
 }
 export default createAdminHandler();
